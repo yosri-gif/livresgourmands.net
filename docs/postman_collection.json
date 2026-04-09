@@ -1,0 +1,402 @@
+{
+  "info": {
+    "name": "livresgourmands.net — API REST",
+    "description": "Collection Postman complète — PWA Étape 02 — Arfaoui Yosri",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url",       "value": "http://localhost:3000" },
+    { "key": "token",          "value": "" },
+    { "key": "token_editeur",  "value": "" },
+    { "key": "token_admin",    "value": "" }
+  ],
+  "item": [
+    {
+      "name": "🔐 Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Nouveau Utilisateur\",\n  \"email\": \"nouveau@test.com\",\n  \"password\": \"motdepasse123\"\n}" }
+          }
+        },
+        {
+          "name": "Login — client (alice)",
+          "event": [{ "listen": "test", "script": { "exec": ["const r = pm.response.json(); if(r.token) pm.collectionVariables.set('token', r.token);"] } }],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"password123\"\n}" }
+          }
+        },
+        {
+          "name": "Login — editeur",
+          "event": [{ "listen": "test", "script": { "exec": ["const r = pm.response.json(); if(r.token) pm.collectionVariables.set('token_editeur', r.token);"] } }],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"editeur@livresgourmands.net\",\n  \"password\": \"password123\"\n}" }
+          }
+        },
+        {
+          "name": "Login — admin",
+          "event": [{ "listen": "test", "script": { "exec": ["const r = pm.response.json(); if(r.token) pm.collectionVariables.set('token_admin', r.token);"] } }],
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/auth/login",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@livresgourmands.net\",\n  \"password\": \"password123\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 Utilisateurs",
+      "item": [
+        {
+          "name": "Mon profil (GET /users/me)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/users/me",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Liste utilisateurs (admin)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/users",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_admin}}" }]
+          }
+        },
+        {
+          "name": "Modifier mon profil",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/users/4",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Alice Modifiée\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📚 Ouvrages",
+      "item": [
+        {
+          "name": "Liste ouvrages (public)",
+          "request": { "method": "GET", "url": "{{base_url}}/api/ouvrages" }
+        },
+        {
+          "name": "Recherche par titre",
+          "request": { "method": "GET", "url": "{{base_url}}/api/ouvrages?search=1984" }
+        },
+        {
+          "name": "Filtrer par catégorie",
+          "request": { "method": "GET", "url": "{{base_url}}/api/ouvrages?categorie=3" }
+        },
+        {
+          "name": "Trier par popularité",
+          "request": { "method": "GET", "url": "{{base_url}}/api/ouvrages?sort=popularite" }
+        },
+        {
+          "name": "Trier par prix croissant",
+          "request": { "method": "GET", "url": "{{base_url}}/api/ouvrages?sort=prix_asc" }
+        },
+        {
+          "name": "Détail ouvrage (id=2)",
+          "request": { "method": "GET", "url": "{{base_url}}/api/ouvrages/2" }
+        },
+        {
+          "name": "Créer un ouvrage (admin)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/ouvrages",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"titre\": \"La cuisine du monde\",\n  \"auteur\": \"Chef Michel\",\n  \"isbn\": \"978-2-00-000001-1\",\n  \"description\": \"Un tour du monde gastronomique.\",\n  \"prix\": 29.99,\n  \"stock\": 20,\n  \"categorie_id\": 6\n}" }
+          }
+        },
+        {
+          "name": "Modifier un ouvrage (admin)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/ouvrages/1",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"prix\": 8.99,\n  \"stock\": 50\n}" }
+          }
+        },
+        {
+          "name": "Supprimer un ouvrage (admin)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/ouvrages/99",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_admin}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "🗂️ Catégories",
+      "item": [
+        {
+          "name": "Liste catégories (public)",
+          "request": { "method": "GET", "url": "{{base_url}}/api/categories" }
+        },
+        {
+          "name": "Créer catégorie (editeur)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/categories",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_editeur}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Philosophie\",\n  \"description\": \"Ouvrages de philosophie\"\n}" }
+          }
+        },
+        {
+          "name": "Modifier catégorie (editeur)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/categories/1",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_editeur}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Romans\",\n  \"description\": \"Fiction et littérature\"\n}" }
+          }
+        },
+        {
+          "name": "Supprimer catégorie (admin)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/categories/99",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_admin}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "🛒 Panier",
+      "item": [
+        {
+          "name": "Voir mon panier",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/panier",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Ajouter article au panier",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/panier/items",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"ouvrage_id\": 3,\n  \"quantite\": 1\n}" }
+          }
+        },
+        {
+          "name": "Modifier quantité (item id=1)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/panier/items/1",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"quantite\": 3\n}" }
+          }
+        },
+        {
+          "name": "Retirer article (item id=1)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/api/panier/items/1",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        }
+      ]
+    },
+    {
+      "name": "📦 Commandes",
+      "item": [
+        {
+          "name": "Créer une commande",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/commandes",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"adresse_livraison\": \"123 rue des Lilas, Montréal QC H2X 1Y1\",\n  \"mode_livraison\": \"standard\",\n  \"mode_paiement\": \"carte\"\n}" }
+          }
+        },
+        {
+          "name": "Mon historique de commandes",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/commandes",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Détail commande (id=1)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/commandes/1",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }]
+          }
+        },
+        {
+          "name": "Changer statut commande (admin)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/commandes/1/status",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"statut\": \"expediee\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🎁 Listes de cadeaux",
+      "item": [
+        {
+          "name": "Créer une liste",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/listes",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"nom\": \"Ma liste de Noël 2026\"\n}" }
+          }
+        },
+        {
+          "name": "Consulter liste par code",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/listes/VOTRE_CODE_ICI"
+          }
+        },
+        {
+          "name": "Ajouter ouvrage à la liste",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/listes/1/items",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"ouvrage_id\": 4,\n  \"quantite_souhaitee\": 1\n}" }
+          }
+        },
+        {
+          "name": "Acheter depuis une liste",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/listes/1/acheter",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"ouvrage_id\": 4,\n  \"quantite\": 1\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "⭐ Avis & Commentaires",
+      "item": [
+        {
+          "name": "Ajouter un avis (achat requis)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/ouvrages/2/avis",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"note\": 5,\n  \"commentaire\": \"Excellent roman, je recommande vivement !\"\n}" }
+          }
+        },
+        {
+          "name": "Soumettre un commentaire",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/ouvrages/2/commentaires",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"contenu\": \"Ce livre m'a vraiment marqué, une lecture incontournable.\"\n}" }
+          }
+        },
+        {
+          "name": "Commentaires en attente (éditeur)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/api/commentaires/pending",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_editeur}}" }]
+          }
+        },
+        {
+          "name": "Valider un commentaire (éditeur)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/commentaires/1/valider",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_editeur}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"action\": \"valider\"\n}" }
+          }
+        },
+        {
+          "name": "Rejeter un commentaire (éditeur)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/api/commentaires/1/valider",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token_editeur}}" },
+              { "key": "Content-Type",  "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"action\": \"rejeter\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏥 Health Check",
+      "item": [
+        {
+          "name": "Health",
+          "request": { "method": "GET", "url": "{{base_url}}/api/health" }
+        }
+      ]
+    }
+  ]
+}
